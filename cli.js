@@ -43,7 +43,6 @@ const cli = meow(`
 }
 )
 
-const args = process.argv
 const { flags, input } = cli
 
 const options = {
@@ -108,41 +107,44 @@ function run ({
   fillDefaultHash,
   output
 }) {
-	try {
-		const options = {
-			hashLeaves,
-			sort,
-			sortLeaves,
-			sortPairs,
-			duplicateOdd,
-			isBitcoinTree,
-			fillDefaultHash
-		}
-		const hashFn = hashFunctions[hash]
-		if (!hashFn) {
-			throw new Error('invalid hash option or not supported')
-		}
-		const tree = new MerkleTree(leaves, hashFn, options)
-		if (output === 'root') {
-			const root = tree.getHexRoot()
-			process.stdout.write(root)
-		} else if (output === 'leaves') {
-			const leaves = tree.getHexLeaves()
-			process.stdout.write(JSON.stringify(leaves, null, 2))
-		} else if (output === 'layers') {
-			const layers = tree.getHexLayers()
-			process.stdout.write(JSON.stringify(layers, null, 2))
-		} else if (output === 'layers-flat') {
-			const layers = tree.getHexLayersFlat()
-			process.stdout.write(JSON.stringify(layers, null, 2))
-		} else if (output === 'tree') {
-			process.stdout.write(tree.toString())
-		} else {
-			process.stdout.write(tree.toString())
-		}
-		process.exit(0)
-	} catch(err) {
-		console.error(err.message)
-		process.exit(1)
-	}
+  try {
+    if (!Array.isArray(leaves)) {
+      throw new Error('array of leaves is requred')
+    }
+    const options = {
+      hashLeaves,
+      sort,
+      sortLeaves,
+      sortPairs,
+      duplicateOdd,
+      isBitcoinTree,
+      fillDefaultHash
+    }
+    const hashFn = hashFunctions[hash]
+    if (!hashFn) {
+      throw new Error('invalid hash option or not supported')
+    }
+    const tree = new MerkleTree(leaves, hashFn, options)
+    if (output === 'root') {
+      const root = tree.getHexRoot()
+      process.stdout.write(root)
+    } else if (output === 'leaves') {
+      const leaves = tree.getHexLeaves()
+      process.stdout.write(JSON.stringify(leaves, null, 2))
+    } else if (output === 'layers') {
+      const layers = tree.getHexLayers()
+      process.stdout.write(JSON.stringify(layers, null, 2))
+    } else if (output === 'layers-flat') {
+      const layers = tree.getHexLayersFlat()
+      process.stdout.write(JSON.stringify(layers, null, 2))
+    } else if (output === 'tree') {
+      process.stdout.write(tree.toString())
+    } else {
+      process.stdout.write(tree.toString())
+    }
+    process.exit(0)
+  } catch (err) {
+    console.error(err.message)
+    process.exit(1)
+  }
 }
